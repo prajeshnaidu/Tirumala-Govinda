@@ -1,0 +1,1 @@
+Replace this with your separately composed portrait scene-tall.png asset. Do not crop scene-wide.png.
