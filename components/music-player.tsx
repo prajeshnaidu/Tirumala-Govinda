@@ -77,7 +77,7 @@ export type Track = {
 };
 
 // ============================================================
-// YOUTUBE VIDEO IDs
+// YOUTUBE VIDEO IDS
 // ============================================================
 //
 // IMPORTANT:
@@ -169,14 +169,13 @@ const VIDEO_IDS = {
 // COVER IMAGE MAPPING
 // ============================================================
 //
-// You currently have:
+// We have only 13 cover images.
 //
-// /public/covers/balaji-01.jpg
-// /public/covers/balaji-02.jpg
-// ...
-// /public/covers/balaji-13.jpg
+// 01-09 = JPG
+// 10-11 = PNG
+// 12-13 = JPG
 //
-// The 13 images automatically repeat.
+// Images automatically repeat:
 //
 // Song 01 -> Image 01
 // Song 02 -> Image 02
@@ -203,7 +202,13 @@ const getCoverImage = (
     imageNumber
   ).padStart(2, "0");
 
-  return `/covers/balaji-${imageId}.jpg`;
+  const extension =
+    imageNumber === 10 ||
+    imageNumber === 11
+      ? "png"
+      : "jpg";
+
+  return `/covers/balaji-${imageId}.${extension}`;
 };
 
 // ============================================================
@@ -226,16 +231,11 @@ const makeTrack = (
 
 // ============================================================
 // PLAYLISTS
-// EXACT ORDER FROM BALAJI SONGS(3).DOCX
+// EXACT ORDER FROM BALAJI SONGS DOCX
 // TOTAL = 23 SONGS
 // ============================================================
 
 const PLAYLISTS = [
-  // ==========================================================
-  // PLAYLIST 1
-  // SONGS 01 - 10
-  // ==========================================================
-
   {
     id: "tirumala",
     name: "Tirumala Classics",
@@ -285,24 +285,19 @@ const PLAYLISTS = [
         "balaji-09",
         "Shree Venkatesha Mangalashasanam"
       ),
-
-      makeTrack(
-        "balaji-10",
-        "Sri Venkatesham Manasa Smarami"
-      ),
     ],
   },
-
-  // ==========================================================
-  // PLAYLIST 2
-  // SONGS 11 - 18
-  // ==========================================================
 
   {
     id: "venkatesa",
     name: "Venkatesa Bhakti",
 
     tracks: [
+      makeTrack(
+        "balaji-10",
+        "Sri Venkatesham Manasa Smarami"
+      ),
+
       makeTrack(
         "balaji-11",
         "Sriman Narayana"
@@ -337,24 +332,19 @@ const PLAYLISTS = [
         "balaji-17",
         "Kamaneeyam"
       ),
-
-      makeTrack(
-        "balaji-18",
-        "Brahmanda Nayakuni Brahmotsavam"
-      ),
     ],
   },
-
-  // ==========================================================
-  // PLAYLIST 3
-  // SONGS 19 - 23
-  // ==========================================================
 
   {
     id: "suprabhatam",
     name: "Morning & Suprabhatam",
 
     tracks: [
+      makeTrack(
+        "balaji-18",
+        "Brahmanda Nayakuni Brahmotsavam"
+      ),
+
       makeTrack(
         "balaji-19",
         "Adi Sesha Anantha Sayana Srinivasa"
@@ -395,8 +385,7 @@ function formatTime(value: number) {
     return "0:00";
   }
 
-  const seconds =
-    Math.floor(value);
+  const seconds = Math.floor(value);
 
   return `${Math.floor(
     seconds / 60
@@ -422,9 +411,7 @@ function useMediaQuery(
       window.matchMedia(query);
 
     const update = () => {
-      setMatches(
-        media.matches
-      );
+      setMatches(media.matches);
     };
 
     update();
@@ -471,8 +458,7 @@ function SeekBar({
           100,
           Math.max(
             0,
-            (progress /
-              duration) *
+            (progress / duration) *
               100
           )
         )
@@ -1255,6 +1241,8 @@ export default function MusicPlayer() {
           sm:flex
         "
       >
+        {/* COVER IMAGE */}
+
         <div
           className="
             relative
@@ -1266,9 +1254,13 @@ export default function MusicPlayer() {
             bg-black
           "
         >
+          {/* REAL BALAJI COVER */}
+
           <CoverImage
             track={current}
           />
+
+          {/* YOUTUBE PLAYER - HIDDEN VISUALLY */}
 
           <div
             ref={desktopHostRef}
@@ -1276,16 +1268,20 @@ export default function MusicPlayer() {
               absolute
               inset-0
               z-20
-              opacity-0
               pointer-events-none
+              opacity-0
             "
             aria-label="YouTube audio player"
           />
+
+          {/* VINYL EFFECT */}
 
           <Vinyl
             playing={playing}
           />
         </div>
+
+        {/* SONG INFORMATION */}
 
         <div
           className="
@@ -1302,7 +1298,11 @@ export default function MusicPlayer() {
               gap-3
             "
           >
-            <div className="min-w-0">
+            <div
+              className="
+                min-w-0
+              "
+            >
               <p
                 className="
                   truncate
@@ -1348,6 +1348,8 @@ export default function MusicPlayer() {
             onSeek={seek}
           />
         </div>
+
+        {/* CONTROLS */}
 
         <div
           className="
@@ -1418,6 +1420,8 @@ export default function MusicPlayer() {
           sm:hidden
         "
       >
+        {/* COVER + SONG INFORMATION */}
+
         <div
           className="
             flex
@@ -1425,6 +1429,8 @@ export default function MusicPlayer() {
             gap-3
           "
         >
+          {/* MOBILE COVER */}
+
           <div
             className="
               relative
@@ -1436,9 +1442,13 @@ export default function MusicPlayer() {
               bg-black
             "
           >
+            {/* REAL BALAJI COVER */}
+
             <CoverImage
               track={current}
             />
+
+            {/* YOUTUBE PLAYER - HIDDEN VISUALLY */}
 
             <div
               ref={mobileHostRef}
@@ -1446,11 +1456,13 @@ export default function MusicPlayer() {
                 absolute
                 inset-0
                 z-20
-                opacity-0
                 pointer-events-none
+                opacity-0
               "
               aria-label="YouTube audio player"
             />
+
+            {/* VINYL EFFECT */}
 
             <Vinyl
               compact
@@ -1458,7 +1470,13 @@ export default function MusicPlayer() {
             />
           </div>
 
-          <div className="min-w-0">
+          {/* SONG NAME */}
+
+          <div
+            className="
+              min-w-0
+            "
+          >
             <p
               className="
                 truncate
@@ -1481,6 +1499,8 @@ export default function MusicPlayer() {
           </div>
         </div>
 
+        {/* SEEK BAR */}
+
         <div className="mt-3">
           <SeekBar
             progress={progress}
@@ -1488,6 +1508,8 @@ export default function MusicPlayer() {
             onSeek={seek}
           />
         </div>
+
+        {/* TIME + CONTROLS */}
 
         <div
           className="
@@ -1519,6 +1541,8 @@ export default function MusicPlayer() {
               items-center
             "
           >
+            {/* PREVIOUS */}
+
             <TransportButton
               label="Previous track"
               onClick={() =>
@@ -1529,6 +1553,8 @@ export default function MusicPlayer() {
                 ‹
               </span>
             </TransportButton>
+
+            {/* PLAY / PAUSE */}
 
             <TransportButton
               label={
@@ -1555,6 +1581,8 @@ export default function MusicPlayer() {
                 ? "Ⅱ"
                 : "▶"}
             </TransportButton>
+
+            {/* NEXT */}
 
             <TransportButton
               label="Next track"
