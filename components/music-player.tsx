@@ -77,7 +77,7 @@ export type Track = {
 };
 
 // ============================================================
-// YOUTUBE VIDEO IDS
+// YOUTUBE VIDEO IDs
 // ============================================================
 //
 // IMPORTANT:
@@ -89,8 +89,6 @@ export type Track = {
 //
 // Video ID:
 // ABC123XYZ
-//
-// Do NOT paste the complete YouTube URL.
 //
 // ============================================================
 
@@ -169,22 +167,18 @@ const VIDEO_IDS = {
 // COVER IMAGE MAPPING
 // ============================================================
 //
-// We have only 13 cover images.
+// Available cover images:
 //
-// 01-09 = JPG
-// 10-11 = PNG
-// 12-13 = JPG
-//
-// Images automatically repeat:
-//
-// Song 01 -> Image 01
-// Song 02 -> Image 02
+// balaji-01.jpg
+// balaji-02.jpg
 // ...
-// Song 13 -> Image 13
-// Song 14 -> Image 01
-// Song 15 -> Image 02
-// ...
-// Song 23 -> Image 10
+// balaji-09.jpg
+// balaji-10.png
+// balaji-11.png
+// balaji-12.jpg
+// balaji-13.jpg
+//
+// Images repeat automatically after image 13.
 //
 // ============================================================
 
@@ -231,7 +225,6 @@ const makeTrack = (
 
 // ============================================================
 // PLAYLISTS
-// EXACT ORDER FROM BALAJI SONGS DOCX
 // TOTAL = 23 SONGS
 // ============================================================
 
@@ -411,7 +404,9 @@ function useMediaQuery(
       window.matchMedia(query);
 
     const update = () => {
-      setMatches(media.matches);
+      setMatches(
+        media.matches
+      );
     };
 
     update();
@@ -729,6 +724,23 @@ export default function MusicPlayer() {
       null
     );
 
+  // ==========================================================
+  // AUTOPLAY REF
+  // ==========================================================
+  //
+  // true = a new track should automatically start.
+  //
+  // This becomes true when:
+  //
+  // 1. User clicks Next
+  // 2. User clicks Previous
+  // 3. Current song finishes
+  //
+  // ==========================================================
+
+  const autoplayNextRef =
+    useRef(false);
+
   const advanceRef =
     useRef<
       (
@@ -832,6 +844,14 @@ export default function MusicPlayer() {
       (
         direction: 1 | -1
       ) => {
+        // IMPORTANT:
+        //
+        // Tell the new YouTube player that it
+        // must automatically start.
+        //
+        autoplayNextRef.current =
+          true;
+
         setTrackIndex(
           (old) => {
             const next =
@@ -879,6 +899,10 @@ export default function MusicPlayer() {
 
       playerRef.current?.destroy();
 
+      // Save whether this player needs autoplay.
+      const shouldAutoplay =
+        autoplayNextRef.current;
+
       playerRef.current =
         new window.YT.Player(
           hostRef.current,
@@ -887,7 +911,13 @@ export default function MusicPlayer() {
               current.videoId,
 
             playerVars: {
-              autoplay: 0,
+              // 1 when Next/Previous was clicked
+              // or when the previous song ended.
+              autoplay:
+                shouldAutoplay
+                  ? 1
+                  : 0,
+
               controls: 0,
               rel: 0,
               modestbranding: 1,
@@ -896,6 +926,10 @@ export default function MusicPlayer() {
             },
 
             events: {
+              // ==================================================
+              // PLAYER READY
+              // ==================================================
+
               onReady: (
                 event
               ) => {
@@ -906,7 +940,28 @@ export default function MusicPlayer() {
                 if (d > 0) {
                   setDuration(d);
                 }
+
+                // ================================================
+                // IMPORTANT AUTOPLAY
+                // ================================================
+                //
+                // If this track was selected using Next,
+                // Previous, or automatic track advancement,
+                // immediately start it.
+                //
+                if (
+                  autoplayNextRef.current
+                ) {
+                  autoplayNextRef.current =
+                    false;
+
+                  event.target.playVideo();
+                }
               },
+
+              // ==================================================
+              // STATE CHANGE
+              // ==================================================
 
               onStateChange: (
                 event
@@ -919,6 +974,10 @@ export default function MusicPlayer() {
                   return;
                 }
 
+                // -----------------------------------------------
+                // PLAYING
+                // -----------------------------------------------
+
                 if (
                   event.data ===
                   states.PLAYING
@@ -926,14 +985,26 @@ export default function MusicPlayer() {
                   setPlaying(true);
 
                   startProgress();
-                } else if (
+                }
+
+                // -----------------------------------------------
+                // PAUSED
+                // -----------------------------------------------
+
+                else if (
                   event.data ===
                   states.PAUSED
                 ) {
                   setPlaying(false);
 
                   stopProgress();
-                } else if (
+                }
+
+                // -----------------------------------------------
+                // ENDED
+                // -----------------------------------------------
+
+                else if (
                   event.data ===
                   states.ENDED
                 ) {
@@ -941,11 +1012,19 @@ export default function MusicPlayer() {
 
                   stopProgress();
 
+                  // The next track should automatically play.
+                  autoplayNextRef.current =
+                    true;
+
                   advanceRef.current(
                     1
                   );
                 }
               },
+
+              // ==================================================
+              // YOUTUBE ERROR
+              // ==================================================
 
               onError: (
                 event
@@ -964,6 +1043,10 @@ export default function MusicPlayer() {
                 setPlaying(false);
 
                 stopProgress();
+
+                // Move to the next track automatically.
+                autoplayNextRef.current =
+                  true;
 
                 advanceRef.current(
                   1
@@ -1137,6 +1220,11 @@ export default function MusicPlayer() {
   const changePlaylist = (
     index: number
   ) => {
+    // Changing playlist manually should start
+    // the first song automatically.
+    autoplayNextRef.current =
+      true;
+
     setPlaylistIndex(index);
 
     setTrackIndex(0);
@@ -1211,6 +1299,7 @@ export default function MusicPlayer() {
                 px-3
                 py-1.5
                 transition
+
                 ${
                   playlistIndex ===
                   index
@@ -1358,6 +1447,8 @@ export default function MusicPlayer() {
             items-center
           "
         >
+          {/* PREVIOUS */}
+
           <TransportButton
             label="Previous track"
             onClick={() =>
@@ -1368,6 +1459,8 @@ export default function MusicPlayer() {
               ‹
             </span>
           </TransportButton>
+
+          {/* PLAY / PAUSE */}
 
           <TransportButton
             label={
@@ -1394,6 +1487,8 @@ export default function MusicPlayer() {
               ? "Ⅱ"
               : "▶"}
           </TransportButton>
+
+          {/* NEXT */}
 
           <TransportButton
             label="Next track"
