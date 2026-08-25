@@ -80,7 +80,7 @@ export type Track = {
   // Desktop image
   desktopCover: string;
 
-  // Currently active image
+  // Currently active responsive image
   cover: string;
 };
 
@@ -126,14 +126,19 @@ const MUSIC_AUDIO = "/audio/music.mp3";
 // ============================================================
 
 /*
-  You currently have 13 image designs.
+  You currently have 13 mobile images
+  and 13 desktop images.
 
   Songs 01 - 13
       -> use images 01 - 13
 
   Songs 14 - 23
-      -> automatically reuse images 01 - 10
+      -> reuse images 01 - 10
 */
+
+// ============================================================
+// IMAGE NUMBER
+// ============================================================
 
 const getImageNumber = (
   id: keyof typeof VIDEO_IDS
@@ -146,7 +151,7 @@ const getImageNumber = (
 };
 
 // ============================================================
-// MOBILE IMAGE
+// MOBILE COVER
 // ============================================================
 
 const getMobileCover = (
@@ -154,28 +159,25 @@ const getMobileCover = (
 ): string => {
   const imageNumber = getImageNumber(id);
 
-  const imageId = String(
-    imageNumber
-  ).padStart(2, "0");
+  const imageId = String(imageNumber).padStart(2, "0");
 
   /*
     Mobile files:
 
-    balaji-01.jpg
-    balaji-02.jpg
+    public/covers/balaji-01.jpg
+    public/covers/balaji-02.jpg
     ...
-    balaji-09.jpg
+    public/covers/balaji-09.jpg
 
-    balaji-10.png
-    balaji-11.png
+    public/covers/balaji-10.png
+    public/covers/balaji-11.png
 
-    balaji-12.jpg
-    balaji-13.jpg
+    public/covers/balaji-12.jpg
+    public/covers/balaji-13.jpg
   */
 
   const extension =
-    imageNumber === 10 ||
-    imageNumber === 11
+    imageNumber === 10 || imageNumber === 11
       ? "png"
       : "jpg";
 
@@ -183,7 +185,7 @@ const getMobileCover = (
 };
 
 // ============================================================
-// DESKTOP IMAGE
+// DESKTOP COVER
 // ============================================================
 
 const getDesktopCover = (
@@ -191,22 +193,22 @@ const getDesktopCover = (
 ): string => {
   const imageNumber = getImageNumber(id);
 
-  const imageId = String(
-    imageNumber
-  ).padStart(2, "0");
+  const imageId = String(imageNumber).padStart(2, "0");
 
   /*
-    Desktop images are expected to be JPG.
+    IMPORTANT:
+
+    Desktop images are PNG files.
 
     Example:
 
-    public/covers-desktop/balaji-01.jpg
-    public/covers-desktop/balaji-02.jpg
+    public/covers-desktop/balaji-01.png
+    public/covers-desktop/balaji-02.png
     ...
-    public/covers-desktop/balaji-13.jpg
+    public/covers-desktop/balaji-13.png
   */
 
-  return `/covers-desktop/balaji-${imageId}.jpg`;
+  return `/covers-desktop/balaji-${imageId}.png`;
 };
 
 // ============================================================
@@ -217,11 +219,8 @@ const makeTrack = (
   id: keyof typeof VIDEO_IDS,
   title: string
 ): Track => {
-  const mobileCover =
-    getMobileCover(id);
-
-  const desktopCover =
-    getDesktopCover(id);
+  const mobileCover = getMobileCover(id);
+  const desktopCover = getDesktopCover(id);
 
   return {
     id,
@@ -235,7 +234,7 @@ const makeTrack = (
     mobileCover,
     desktopCover,
 
-    // Mobile is the initial default.
+    // Will be replaced according to device.
     cover: mobileCover,
   };
 };
@@ -253,42 +252,34 @@ const PLAYLISTS = [
         "balaji-01",
         "Sri Venkatesa Suprabhatham — M. S. Subbulakshmi"
       ),
-
       makeTrack(
         "balaji-02",
         "Govinda Namalu"
       ),
-
       makeTrack(
         "balaji-03",
         "Govinda Govinda Yani Koluvare"
       ),
-
       makeTrack(
         "balaji-04",
         "Shree Vishnu Dhyanam"
       ),
-
       makeTrack(
         "balaji-05",
         "Om Namo Bhagavate Vasudevaya"
       ),
-
       makeTrack(
         "balaji-06",
         "Kamalakucha"
       ),
-
       makeTrack(
         "balaji-07",
         "Namo Re - Telugu"
       ),
-
       makeTrack(
         "balaji-08",
         "Adivo Alladivo"
       ),
-
       makeTrack(
         "balaji-09",
         "Shree Venkatesha Mangalashasanam"
@@ -304,42 +295,34 @@ const PLAYLISTS = [
         "balaji-10",
         "Sri Venkatesham Manasa Smarami"
       ),
-
       makeTrack(
         "balaji-11",
         "Sriman Narayana"
       ),
-
       makeTrack(
         "balaji-12",
         "Govindha Hari Govindha"
       ),
-
       makeTrack(
         "balaji-13",
         "Akhilanda Koti"
       ),
-
       makeTrack(
         "balaji-14",
         "Veyi Naamaala Vaada"
       ),
-
       makeTrack(
         "balaji-15",
         "Jaya Jaya Sree Venkataramana"
       ),
-
       makeTrack(
         "balaji-16",
         "Brahma Kadigina Padamu"
       ),
-
       makeTrack(
         "balaji-17",
         "Kamaneeyam"
       ),
-
       makeTrack(
         "balaji-18",
         "Brahmanda Nayakuni Brahmotsavam"
@@ -355,22 +338,18 @@ const PLAYLISTS = [
         "balaji-19",
         "Adi Sesha Anantha Sayana Srinivasa"
       ),
-
       makeTrack(
         "balaji-20",
         "Vedukondama Venkatagiri"
       ),
-
       makeTrack(
         "balaji-21",
         "Shesha Sayanam Sheshadri Vaasa"
       ),
-
       makeTrack(
         "balaji-22",
         "Kaliyuga Vaikuntapuri"
       ),
-
       makeTrack(
         "balaji-23",
         "Pareeksha"
@@ -383,22 +362,14 @@ const PLAYLISTS = [
 // FORMAT TIME
 // ============================================================
 
-function formatTime(
-  value: number
-) {
-  if (
-    !Number.isFinite(value) ||
-    value < 0
-  ) {
+function formatTime(value: number) {
+  if (!Number.isFinite(value) || value < 0) {
     return "0:00";
   }
 
-  const seconds =
-    Math.floor(value);
+  const seconds = Math.floor(value);
 
-  return `${Math.floor(
-    seconds / 60
-  )}:${String(
+  return `${Math.floor(seconds / 60)}:${String(
     seconds % 60
   ).padStart(2, "0")}`;
 }
@@ -407,36 +378,22 @@ function formatTime(
 // MEDIA QUERY
 // ============================================================
 
-function useMediaQuery(
-  query: string
-) {
-  const [
-    matches,
-    setMatches,
-  ] = useState(false);
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const media =
-      window.matchMedia(query);
+    const media = window.matchMedia(query);
 
     const update = () => {
-      setMatches(
-        media.matches
-      );
+      setMatches(media.matches);
     };
 
     update();
 
-    media.addEventListener(
-      "change",
-      update
-    );
+    media.addEventListener("change", update);
 
     return () => {
-      media.removeEventListener(
-        "change",
-        update
-      );
+      media.removeEventListener("change", update);
     };
   }, [query]);
 
@@ -454,53 +411,34 @@ function SeekBar({
 }: {
   progress: number;
   duration: number;
-  onSeek: (
-    ratio: number
-  ) => void;
+  onSeek: (ratio: number) => void;
 }) {
-  const ref =
-    useRef<HTMLInputElement>(
-      null
-    );
+  const ref = useRef<HTMLInputElement>(null);
 
   const value =
     duration > 0
       ? Math.min(
           100,
-          Math.max(
-            0,
-            (progress /
-              duration) *
-              100
-          )
+          Math.max(0, (progress / duration) * 100)
         )
       : 0;
 
   const pointerSeek = (
     event: ReactPointerEvent<HTMLInputElement>
   ) => {
-    if (
-      duration <= 0 ||
-      !ref.current
-    ) {
+    if (duration <= 0 || !ref.current) {
       return;
     }
 
-    const rect =
-      ref.current.getBoundingClientRect();
+    const rect = ref.current.getBoundingClientRect();
 
     const ratio =
-      (event.clientX -
-        rect.left) /
-      rect.width;
+      (event.clientX - rect.left) / rect.width;
 
     onSeek(
       Math.min(
         1,
-        Math.max(
-          0,
-          ratio
-        )
+        Math.max(0, ratio)
       )
     );
   };
@@ -513,9 +451,7 @@ function SeekBar({
       min="0"
       max="100"
       value={value}
-      onPointerDown={
-        pointerSeek
-      }
+      onPointerDown={pointerSeek}
       onChange={() => {}}
       className="
         seek-hit
@@ -637,7 +573,6 @@ function Vinyl({
             rounded-full
             border
             border-white/10
-
             bg-[radial-gradient(circle_at_center,transparent_0_10%,rgba(255,255,255,.09)_10.5%,transparent_11%,transparent_28%,rgba(255,255,255,.06)_28.5%,transparent_29%,transparent_47%,rgba(255,255,255,.05)_47.5%,transparent_48%)]
           "
         />
@@ -673,35 +608,34 @@ function CoverImage({
   track: Track;
   isDesktop: boolean;
 }) {
-  const [
-    imageSrc,
-    setImageSrc,
-  ] = useState(
-    track.cover
+  const [imageSrc, setImageSrc] = useState(
+    isDesktop
+      ? track.desktopCover
+      : track.mobileCover
   );
-
-  /*
-    If desktop image is missing,
-    automatically use mobile image.
-  */
 
   useEffect(() => {
     setImageSrc(
-      track.cover
+      isDesktop
+        ? track.desktopCover
+        : track.mobileCover
     );
   }, [
-    track.cover,
+    isDesktop,
+    track.desktopCover,
+    track.mobileCover,
   ]);
 
   const handleError = () => {
+    /*
+      If desktop image is missing,
+      automatically fall back to mobile.
+    */
     if (
       isDesktop &&
-      imageSrc !==
-        track.mobileCover
+      imageSrc !== track.mobileCover
     ) {
-      setImageSrc(
-        track.mobileCover
-      );
+      setImageSrc(track.mobileCover);
     }
   };
 
@@ -709,9 +643,7 @@ function CoverImage({
     <img
       src={imageSrc}
       alt={track.title}
-      onError={
-        handleError
-      }
+      onError={handleError}
       className="
         absolute
         inset-0
@@ -757,46 +689,35 @@ export default function MusicPlayer() {
   // DESKTOP / MOBILE
   // ==========================================================
 
-  const isDesktop =
-    useMediaQuery(
-      "(min-width: 640px)"
-    );
+  const isDesktop = useMediaQuery(
+    "(min-width: 640px)"
+  );
 
   // ==========================================================
   // YOUTUBE
   // ==========================================================
 
   const playerRef =
-    useRef<YTPlayer | null>(
-      null
-    );
+    useRef<YTPlayer | null>(null);
 
   const desktopHostRef =
-    useRef<HTMLDivElement>(
-      null
-    );
+    useRef<HTMLDivElement>(null);
 
   const mobileHostRef =
-    useRef<HTMLDivElement>(
-      null
-    );
+    useRef<HTMLDivElement>(null);
 
   const apiReadyRef =
     useRef(false);
 
   const animationRef =
-    useRef<number | null>(
-      null
-    );
+    useRef<number | null>(null);
 
   const autoPlayNextRef =
     useRef(false);
 
   const advanceRef =
     useRef<
-      (
-        direction: 1 | -1
-      ) => void
+      (direction: 1 | -1) => void
     >(() => {});
 
   // ==========================================================
@@ -804,56 +725,45 @@ export default function MusicPlayer() {
   // ==========================================================
 
   const ambienceRef =
-    useRef<HTMLAudioElement | null>(
-      null
-    );
+    useRef<HTMLAudioElement | null>(null);
 
   const musicRef =
-    useRef<HTMLAudioElement | null>(
-      null
-    );
+    useRef<HTMLAudioElement | null>(null);
 
   // ==========================================================
   // CURRENT PLAYLIST
   // ==========================================================
 
   const playlist =
-    PLAYLISTS[
-      playlistIndex
-    ];
+    PLAYLISTS[playlistIndex];
 
   const currentBase =
-    playlist.tracks[
-      trackIndex
-    ];
+    playlist.tracks[trackIndex];
 
   // ==========================================================
   // RESPONSIVE CURRENT TRACK
   // ==========================================================
 
-  const current =
-    useMemo<Track>(() => {
-      return {
-        ...currentBase,
+  const current = useMemo<Track>(() => {
+    return {
+      ...currentBase,
 
-        cover:
-          isDesktop
-            ? currentBase.desktopCover
-            : currentBase.mobileCover,
-      };
-    }, [
-      currentBase,
-      isDesktop,
-    ]);
+      cover: isDesktop
+        ? currentBase.desktopCover
+        : currentBase.mobileCover,
+    };
+  }, [
+    currentBase,
+    isDesktop,
+  ]);
 
   // ==========================================================
   // CURRENT YOUTUBE HOST
   // ==========================================================
 
-  const hostRef =
-    isDesktop
-      ? desktopHostRef
-      : mobileHostRef;
+  const hostRef = isDesktop
+    ? desktopHostRef
+    : mobileHostRef;
 
   // ==========================================================
   // MAIN BACKGROUND IMAGE
@@ -870,8 +780,11 @@ export default function MusicPlayer() {
     }
 
     /*
-      First use the correct responsive
-      desktop/mobile image.
+      Desktop:
+      /covers-desktop/balaji-XX.png
+
+      Mobile:
+      /covers/balaji-XX.jpg/png
     */
 
     hero.style.backgroundImage =
@@ -887,29 +800,31 @@ export default function MusicPlayer() {
       "no-repeat";
 
     /*
-      Preload image.
+      Preload the responsive image.
 
-      If desktop image does not exist,
-      automatically fall back to mobile.
+      If desktop image is missing,
+      use the mobile image.
     */
 
     const testImage =
       new Image();
 
-    testImage.onload =
-      () => {
-        hero.style.backgroundImage =
-          `url("${current.cover}")`;
-      };
+    testImage.onload = () => {
+      hero.style.backgroundImage =
+        `url("${current.cover}")`;
+    };
 
-    testImage.onerror =
-      () => {
-        hero.style.backgroundImage =
-          `url("${current.mobileCover}")`;
-      };
+    testImage.onerror = () => {
+      hero.style.backgroundImage =
+        `url("${current.mobileCover}")`;
+    };
 
-    testImage.src =
-      current.cover;
+    testImage.src = current.cover;
+
+    return () => {
+      testImage.onload = null;
+      testImage.onerror = null;
+    };
   }, [
     current.cover,
     current.mobileCover,
@@ -921,14 +836,10 @@ export default function MusicPlayer() {
 
   useEffect(() => {
     const ambience =
-      new Audio(
-        AMBIENCE_AUDIO
-      );
+      new Audio(AMBIENCE_AUDIO);
 
     const music =
-      new Audio(
-        MUSIC_AUDIO
-      );
+      new Audio(MUSIC_AUDIO);
 
     ambience.loop = true;
     music.loop = true;
@@ -965,41 +876,33 @@ export default function MusicPlayer() {
   // ==========================================================
 
   const startBackgroundAudio =
-    useCallback(
-      async () => {
-        const ambience =
-          ambienceRef.current;
+    useCallback(async () => {
+      const ambience =
+        ambienceRef.current;
 
-        const music =
-          musicRef.current;
+      const music =
+        musicRef.current;
 
-        if (
-          !ambience ||
-          !music
-        ) {
-          return;
+      if (!ambience || !music) {
+        return;
+      }
+
+      try {
+        if (ambience.paused) {
+          await ambience.play();
         }
+      } catch {
+        // Browser autoplay policy.
+      }
 
-        try {
-          if (
-            ambience.paused
-          ) {
-            await ambience.play();
-          }
-        } catch {
-          // Browser autoplay policy.
+      try {
+        if (music.paused) {
+          await music.play();
         }
-
-        try {
-          if (music.paused) {
-            await music.play();
-          }
-        } catch {
-          // Browser autoplay policy.
-        }
-      },
-      []
-    );
+      } catch {
+        // Browser autoplay policy.
+      }
+    }, []);
 
   // ==========================================================
   // PAUSE BACKGROUND AUDIO
@@ -1018,16 +921,14 @@ export default function MusicPlayer() {
   const stopProgress =
     useCallback(() => {
       if (
-        animationRef.current !==
-        null
+        animationRef.current !== null
       ) {
         cancelAnimationFrame(
           animationRef.current
         );
       }
 
-      animationRef.current =
-        null;
+      animationRef.current = null;
     }, []);
 
   // ==========================================================
@@ -1036,28 +937,22 @@ export default function MusicPlayer() {
 
   const updateProgress =
     useCallback(() => {
-      if (
-        !playerRef.current
-      ) {
+      if (!playerRef.current) {
         return;
       }
 
       const now =
-        playerRef.current
-          .getCurrentTime() ||
+        playerRef.current.getCurrentTime() ||
         0;
 
       const total =
-        playerRef.current
-          .getDuration() ||
+        playerRef.current.getDuration() ||
         0;
 
       setProgress(now);
 
       if (total > 0) {
-        setDuration(
-          total
-        );
+        setDuration(total);
       }
 
       animationRef.current =
@@ -1094,11 +989,6 @@ export default function MusicPlayer() {
       ) => {
         void startBackgroundAudio();
 
-        /*
-          Tell the new YouTube player
-          to automatically start.
-        */
-
         autoPlayNextRef.current =
           true;
 
@@ -1108,25 +998,18 @@ export default function MusicPlayer() {
         setTrackIndex(
           (old) => {
             const next =
-              old +
-              direction;
+              old + direction;
 
-            if (
-              next < 0
-            ) {
+            if (next < 0) {
               return (
-                playlist
-                  .tracks
-                  .length -
+                playlist.tracks.length -
                 1
               );
             }
 
             if (
               next >=
-              playlist
-                .tracks
-                .length
+              playlist.tracks.length
             ) {
               return 0;
             }
@@ -1177,149 +1060,116 @@ export default function MusicPlayer() {
             },
 
             events: {
-              // =================================================
+              // ==================================================
               // READY
-              // =================================================
+              // ==================================================
 
-              onReady:
-                (
-                  event
-                ) => {
-                  const d =
-                    event.target
-                      .getDuration();
+              onReady: (
+                event
+              ) => {
+                const d =
+                  event.target.getDuration();
 
-                  if (
-                    d > 0
-                  ) {
-                    setDuration(
-                      d
-                    );
-                  }
+                if (d > 0) {
+                  setDuration(d);
+                }
 
-                  /*
-                    Automatically play after
-                    Next / Previous.
-                  */
+                if (
+                  autoPlayNextRef.current
+                ) {
+                  autoPlayNextRef.current =
+                    false;
 
-                  if (
-                    autoPlayNextRef.current
-                  ) {
-                    autoPlayNextRef.current =
-                      false;
+                  void startBackgroundAudio();
 
-                    void startBackgroundAudio();
+                  window.setTimeout(
+                    () => {
+                      try {
+                        event.target.playVideo();
+                      } catch {
+                        // Ignore startup errors.
+                      }
+                    },
+                    100
+                  );
+                }
+              },
 
-                    window.setTimeout(
-                      () => {
-                        try {
-                          event.target.playVideo();
-                        } catch {
-                          // Ignore startup errors.
-                        }
-                      },
-                      100
-                    );
-                  }
-                },
-
-              // =================================================
+              // ==================================================
               // STATE CHANGE
-              // =================================================
+              // ==================================================
 
-              onStateChange:
-                (
-                  event
-                ) => {
-                  const states =
-                    window.YT
-                      ?.PlayerState;
+              onStateChange: (
+                event
+              ) => {
+                const states =
+                  window.YT?.PlayerState;
 
-                  if (
-                    !states
-                  ) {
-                    return;
-                  }
+                if (!states) {
+                  return;
+                }
 
-                  // PLAYING
-                  if (
-                    event.data ===
-                    states.PLAYING
-                  ) {
-                    setPlaying(
-                      true
-                    );
+                // PLAYING
+                if (
+                  event.data ===
+                  states.PLAYING
+                ) {
+                  setPlaying(true);
 
-                    void startBackgroundAudio();
+                  void startBackgroundAudio();
 
-                    startProgress();
-                  }
+                  startProgress();
+                }
 
-                  // PAUSED
-                  else if (
-                    event.data ===
-                    states.PAUSED
-                  ) {
-                    setPlaying(
-                      false
-                    );
-
-                    stopProgress();
-
-                    pauseBackgroundAudio();
-                  }
-
-                  // ENDED
-                  else if (
-                    event.data ===
-                    states.ENDED
-                  ) {
-                    setPlaying(
-                      false
-                    );
-
-                    stopProgress();
-
-                    advanceRef.current(
-                      1
-                    );
-                  }
-                },
-
-              // =================================================
-              // ERROR
-              // =================================================
-
-              onError:
-                (
-                  event
-                ) => {
-                  analyticsTrack(
-                    "youtube_player_error",
-                    {
-                      code: String(
-                        event.data
-                      ),
-                      videoId:
-                        current.videoId,
-                    }
-                  );
-
-                  setPlaying(
-                    false
-                  );
+                // PAUSED
+                else if (
+                  event.data ===
+                  states.PAUSED
+                ) {
+                  setPlaying(false);
 
                   stopProgress();
 
-                  /*
-                    Skip broken YouTube
-                    video automatically.
-                  */
+                  pauseBackgroundAudio();
+                }
 
-                  advanceRef.current(
-                    1
-                  );
-                },
+                // ENDED
+                else if (
+                  event.data ===
+                  states.ENDED
+                ) {
+                  setPlaying(false);
+
+                  stopProgress();
+
+                  advanceRef.current(1);
+                }
+              },
+
+              // ==================================================
+              // ERROR
+              // ==================================================
+
+              onError: (
+                event
+              ) => {
+                analyticsTrack(
+                  "youtube_player_error",
+                  {
+                    code: String(
+                      event.data
+                    ),
+                    videoId:
+                      current.videoId,
+                  }
+                );
+
+                setPlaying(false);
+
+                stopProgress();
+
+                advanceRef.current(1);
+              },
             },
           }
         );
@@ -1337,17 +1187,14 @@ export default function MusicPlayer() {
   // ==========================================================
 
   useEffect(() => {
-    const ready =
-      () => {
-        apiReadyRef.current =
-          true;
+    const ready = () => {
+      apiReadyRef.current =
+        true;
 
-        createPlayer();
-      };
+      createPlayer();
+    };
 
-    if (
-      window.YT?.Player
-    ) {
+    if (window.YT?.Player) {
       ready();
       return;
     }
@@ -1360,9 +1207,7 @@ export default function MusicPlayer() {
         'script[src="https://www.youtube.com/iframe_api"]'
       );
 
-    if (
-      !existingScript
-    ) {
+    if (!existingScript) {
       const script =
         document.createElement(
           "script"
@@ -1387,9 +1232,7 @@ export default function MusicPlayer() {
           undefined;
       }
     };
-  }, [
-    createPlayer,
-  ]);
+  }, [createPlayer]);
 
   // ==========================================================
   // RECREATE PLAYER WHEN:
@@ -1400,35 +1243,24 @@ export default function MusicPlayer() {
   // ==========================================================
 
   useEffect(() => {
-    if (
-      !apiReadyRef.current
-    ) {
+    if (!apiReadyRef.current) {
       return;
     }
 
     playerRef.current?.destroy();
 
-    playerRef.current =
-      null;
+    playerRef.current = null;
 
     stopProgress();
 
-    setPlaying(
-      false
-    );
-
-    setProgress(
-      0
-    );
+    setPlaying(false);
+    setProgress(0);
 
     setDuration(
-      current.duration ||
-        0
+      current.duration || 0
     );
 
-    if (
-      current.videoId
-    ) {
+    if (current.videoId) {
       createPlayer();
     }
   }, [
@@ -1450,8 +1282,7 @@ export default function MusicPlayer() {
 
       playerRef.current?.destroy();
 
-      playerRef.current =
-        null;
+      playerRef.current = null;
 
       pauseBackgroundAudio();
     };
@@ -1466,9 +1297,7 @@ export default function MusicPlayer() {
 
   const seek =
     useCallback(
-      (
-        ratio: number
-      ) => {
+      (ratio: number) => {
         if (
           !playerRef.current ||
           duration <= 0
@@ -1477,21 +1306,16 @@ export default function MusicPlayer() {
         }
 
         const target =
-          duration *
-          ratio;
+          duration * ratio;
 
         playerRef.current.seekTo(
           target,
           true
         );
 
-        setProgress(
-          target
-        );
+        setProgress(target);
       },
-      [
-        duration,
-      ]
+      [duration]
     );
 
   // ==========================================================
@@ -1499,66 +1323,45 @@ export default function MusicPlayer() {
   // ==========================================================
 
   const togglePlay =
-    useCallback(
-      () => {
-        if (
-          !playerRef.current
-        ) {
-          return;
-        }
+    useCallback(() => {
+      if (!playerRef.current) {
+        return;
+      }
 
-        if (
-          playing
-        ) {
-          playerRef.current.pauseVideo();
+      if (playing) {
+        playerRef.current.pauseVideo();
 
-          pauseBackgroundAudio();
-        } else {
-          void startBackgroundAudio();
+        pauseBackgroundAudio();
+      } else {
+        void startBackgroundAudio();
 
-          playerRef.current.playVideo();
-        }
-      },
-      [
-        playing,
-        startBackgroundAudio,
-        pauseBackgroundAudio,
-      ]
-    );
+        playerRef.current.playVideo();
+      }
+    }, [
+      playing,
+      startBackgroundAudio,
+      pauseBackgroundAudio,
+    ]);
 
   // ==========================================================
   // CHANGE PLAYLIST
   // ==========================================================
 
-  const changePlaylist =
-    (
-      index: number
-    ) => {
-      void startBackgroundAudio();
+  const changePlaylist = (
+    index: number
+  ) => {
+    void startBackgroundAudio();
 
-      autoPlayNextRef.current =
-        true;
+    autoPlayNextRef.current =
+      true;
 
-      setPlaying(
-        false
-      );
+    setPlaying(false);
+    setProgress(0);
+    setDuration(0);
 
-      setProgress(
-        0
-      );
-
-      setDuration(
-        0
-      );
-
-      setPlaylistIndex(
-        index
-      );
-
-      setTrackIndex(
-        0
-      );
-    };
+    setPlaylistIndex(index);
+    setTrackIndex(0);
+  };
 
   // ==========================================================
   // SUBTITLE
@@ -1610,14 +1413,10 @@ export default function MusicPlayer() {
             index
           ) => (
             <button
-              key={
-                item.id
-              }
+              key={item.id}
               type="button"
               onClick={() =>
-                changePlaylist(
-                  index
-                )
+                changePlaylist(index)
               }
               className={`
                 shrink-0
@@ -1634,9 +1433,7 @@ export default function MusicPlayer() {
                 }
               `}
             >
-              {
-                item.name
-              }
+              {item.name}
             </button>
           )
         )}
@@ -1673,15 +1470,11 @@ export default function MusicPlayer() {
         >
           <CoverImage
             track={current}
-            isDesktop={
-              true
-            }
+            isDesktop={true}
           />
 
           <div
-            ref={
-              desktopHostRef
-            }
+            ref={desktopHostRef}
             className="
               pointer-events-none
               absolute
@@ -1693,9 +1486,7 @@ export default function MusicPlayer() {
           />
 
           <Vinyl
-            playing={
-              playing
-            }
+            playing={playing}
           />
         </div>
 
@@ -1716,11 +1507,7 @@ export default function MusicPlayer() {
               gap-3
             "
           >
-            <div
-              className="
-                min-w-0
-              "
-            >
+            <div className="min-w-0">
               <p
                 className="
                   truncate
@@ -1728,9 +1515,7 @@ export default function MusicPlayer() {
                   font-semibold
                 "
               >
-                {
-                  current.title
-                }
+                {current.title}
               </p>
 
               <p
@@ -1740,9 +1525,7 @@ export default function MusicPlayer() {
                   text-white/70
                 "
               >
-                {
-                  subtitle
-                }
+                {subtitle}
               </p>
             </div>
 
@@ -1754,34 +1537,19 @@ export default function MusicPlayer() {
                 text-white/55
               "
             >
-              {
-                formatTime(
-                  progress
-                )
-              }{" "}
-              /{" "}
-              {
-                formatTime(
-                  duration
-                )
-              }
+              {formatTime(progress)} /{" "}
+              {formatTime(duration)}
             </span>
           </div>
 
           <SeekBar
-            progress={
-              progress
-            }
-            duration={
-              duration
-            }
-            onSeek={
-              seek
-            }
+            progress={progress}
+            duration={duration}
+            onSeek={seek}
           />
         </div>
 
-        {/* CONTROLS */}
+        {/* DESKTOP CONTROLS */}
 
         <div
           className="
@@ -1790,14 +1558,10 @@ export default function MusicPlayer() {
             items-center
           "
         >
-          {/* PREVIOUS */}
-
           <TransportButton
             label="Previous track"
             onClick={() =>
-              advance(
-                -1
-              )
+              advance(-1)
             }
           >
             <span className="text-lg">
@@ -1805,17 +1569,13 @@ export default function MusicPlayer() {
             </span>
           </TransportButton>
 
-          {/* PLAY / PAUSE */}
-
           <TransportButton
             label={
               playing
                 ? "Pause"
                 : "Play"
             }
-            onClick={
-              togglePlay
-            }
+            onClick={togglePlay}
             className="
               h-12
               w-12
@@ -1828,21 +1588,15 @@ export default function MusicPlayer() {
               shadow-[0_8px_24px_rgba(242,184,75,.28)]
             "
           >
-            {
-              playing
-                ? "Ⅱ"
-                : "▶"
-            }
+            {playing
+              ? "Ⅱ"
+              : "▶"}
           </TransportButton>
-
-          {/* NEXT */}
 
           <TransportButton
             label="Next track"
             onClick={() =>
-              advance(
-                1
-              )
+              advance(1)
             }
           >
             <span className="text-lg">
@@ -1886,15 +1640,11 @@ export default function MusicPlayer() {
           >
             <CoverImage
               track={current}
-              isDesktop={
-                false
-              }
+              isDesktop={false}
             />
 
             <div
-              ref={
-                mobileHostRef
-              }
+              ref={mobileHostRef}
               className="
                 pointer-events-none
                 absolute
@@ -1907,19 +1657,13 @@ export default function MusicPlayer() {
 
             <Vinyl
               compact
-              playing={
-                playing
-              }
+              playing={playing}
             />
           </div>
 
           {/* SONG INFORMATION */}
 
-          <div
-            className="
-              min-w-0
-            "
-          >
+          <div className="min-w-0">
             <p
               className="
                 truncate
@@ -1927,9 +1671,7 @@ export default function MusicPlayer() {
                 font-semibold
               "
             >
-              {
-                current.title
-              }
+              {current.title}
             </p>
 
             <p
@@ -1939,9 +1681,7 @@ export default function MusicPlayer() {
                 text-white/70
               "
             >
-              {
-                subtitle
-              }
+              {subtitle}
             </p>
           </div>
         </div>
@@ -1950,15 +1690,9 @@ export default function MusicPlayer() {
 
         <div className="mt-3">
           <SeekBar
-            progress={
-              progress
-            }
-            duration={
-              duration
-            }
-            onSeek={
-              seek
-            }
+            progress={progress}
+            duration={duration}
+            onSeek={seek}
           />
         </div>
 
@@ -1979,17 +1713,8 @@ export default function MusicPlayer() {
               text-white/55
             "
           >
-            {
-              formatTime(
-                progress
-              )
-            }{" "}
-            /{" "}
-            {
-              formatTime(
-                duration
-              )
-            }
+            {formatTime(progress)} /{" "}
+            {formatTime(duration)}
           </span>
 
           <div
@@ -1998,14 +1723,10 @@ export default function MusicPlayer() {
               items-center
             "
           >
-            {/* PREVIOUS */}
-
             <TransportButton
               label="Previous track"
               onClick={() =>
-                advance(
-                  -1
-                )
+                advance(-1)
               }
             >
               <span className="text-lg">
@@ -2013,17 +1734,13 @@ export default function MusicPlayer() {
               </span>
             </TransportButton>
 
-            {/* PLAY / PAUSE */}
-
             <TransportButton
               label={
                 playing
                   ? "Pause"
                   : "Play"
               }
-              onClick={
-                togglePlay
-              }
+              onClick={togglePlay}
               className="
                 h-[52px]
                 w-[52px]
@@ -2036,21 +1753,15 @@ export default function MusicPlayer() {
                 shadow-[0_8px_24px_rgba(242,184,75,.32)]
               "
             >
-              {
-                playing
-                  ? "Ⅱ"
-                  : "▶"
-              }
+              {playing
+                ? "Ⅱ"
+                : "▶"}
             </TransportButton>
-
-            {/* NEXT */}
 
             <TransportButton
               label="Next track"
               onClick={() =>
-                advance(
-                  1
-                )
+                advance(1)
               }
             >
               <span className="text-lg">
