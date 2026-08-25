@@ -73,128 +73,105 @@ export type Track = {
   year: number;
   duration: number;
   videoId: string;
+
+  // Mobile image
+  mobileCover: string;
+
+  // Desktop image
+  desktopCover: string;
+
+  // Currently active image
   cover: string;
 };
 
 // ============================================================
-// YOUTUBE VIDEO IDs
-// ============================================================
-//
-// IMPORTANT:
-//
-// Paste ONLY the YouTube VIDEO ID.
-//
-// Example URL:
-// https://www.youtube.com/watch?v=ABC123XYZ
-//
-// Video ID:
-// ABC123XYZ
-//
+// YOUTUBE VIDEO IDS
 // ============================================================
 
 const VIDEO_IDS = {
-  // 01 - Sri Venkatesa Suprabhatham — M. S. Subbulakshmi
   "balaji-01": "R-bwYbOExt8",
-
-  // 02 - Govinda Namalu
   "balaji-02": "GA5eGIdW8bY",
-
-  // 03 - Govinda Govinda Yani Koluvare
   "balaji-03": "SwQeUVEb4ZU",
-
-  // 04 - Shree Vishnu Dhyanam
   "balaji-04": "b2jhpsz4aw4",
-
-  // 05 - Om Namo Bhagavate Vasudevaya
   "balaji-05": "lvUlT8VyOaw",
-
-  // 06 - Kamalakucha
   "balaji-06": "yzEHCteFUsw",
-
-  // 07 - Namo Re - Telugu
   "balaji-07": "Ws4xN4ukEXE",
-
-  // 08 - Adivo Alladivo
   "balaji-08": "lBaCFFUm72g",
-
-  // 09 - Shree Venkatesha Mangalashasanam
   "balaji-09": "CCJams4jRyA",
-
-  // 10 - Sri Venkatesham Manasa Smarami
   "balaji-10": "7WjW4LpmgXI",
-
-  // 11 - Sriman Narayana
   "balaji-11": "J8QCip-CHxc",
-
-  // 12 - Govindha Hari Govindha
   "balaji-12": "9pxk955jQcE",
-
-  // 13 - Akhilanda Koti
   "balaji-13": "aKh2b8u9-yI",
-
-  // 14 - Veyi Naamaala Vaada
   "balaji-14": "zDihIkM3ihs",
-
-  // 15 - Jaya Jaya Sree Venkataramana
   "balaji-15": "HxnsAeNJTnk",
-
-  // 16 - Brahma Kadigina Padamu
   "balaji-16": "DL_8qUcbEI4",
-
-  // 17 - Kamaneeyam
   "balaji-17": "bL-xXDIylIQ",
-
-  // 18 - Brahmanda Nayakuni Brahmotsavam
   "balaji-18": "XxplV8bsrx4",
-
-  // 19 - Adi Sesha Anantha Sayana Srinivasa
   "balaji-19": "6Q-upV5WmWo",
-
-  // 20 - Vedukondama Venkatagiri
   "balaji-20": "jsSm0rnZWic",
-
-  // 21 - Shesha Sayanam Sheshadri Vaasa
   "balaji-21": "BrlOYxO_s0s",
-
-  // 22 - Kaliyuga Vaikuntapuri
   "balaji-22": "UdP1UglAi1Y",
-
-  // 23 - Pareeksha
   "balaji-23": "4cXUAXjDYgQ",
 } as const;
 
 // ============================================================
-// COVER IMAGE MAPPING
-// ============================================================
-//
-// Available cover images:
-//
-// balaji-01.jpg
-// balaji-02.jpg
-// ...
-// balaji-09.jpg
-// balaji-10.png
-// balaji-11.png
-// balaji-12.jpg
-// balaji-13.jpg
-//
-// Images repeat automatically after image 13.
-//
+// BACKGROUND AUDIO
 // ============================================================
 
-const getCoverImage = (
+const AMBIENCE_AUDIO = "/audio/ambience.mp3";
+const MUSIC_AUDIO = "/audio/music.mp3";
+
+// ============================================================
+// IMAGE HELPERS
+// ============================================================
+
+/*
+  You currently have 13 image designs.
+
+  Songs 01 - 13
+      -> use images 01 - 13
+
+  Songs 14 - 23
+      -> automatically reuse images 01 - 10
+*/
+
+const getImageNumber = (
   id: keyof typeof VIDEO_IDS
-): string => {
+) => {
   const songNumber = Number(
     id.replace("balaji-", "")
   );
 
-  const imageNumber =
-    ((songNumber - 1) % 13) + 1;
+  return ((songNumber - 1) % 13) + 1;
+};
+
+// ============================================================
+// MOBILE IMAGE
+// ============================================================
+
+const getMobileCover = (
+  id: keyof typeof VIDEO_IDS
+): string => {
+  const imageNumber = getImageNumber(id);
 
   const imageId = String(
     imageNumber
   ).padStart(2, "0");
+
+  /*
+    Mobile files:
+
+    balaji-01.jpg
+    balaji-02.jpg
+    ...
+    balaji-09.jpg
+
+    balaji-10.png
+    balaji-11.png
+
+    balaji-12.jpg
+    balaji-13.jpg
+  */
 
   const extension =
     imageNumber === 10 ||
@@ -206,33 +183,71 @@ const getCoverImage = (
 };
 
 // ============================================================
-// MAKE TRACK
+// DESKTOP IMAGE
+// ============================================================
+
+const getDesktopCover = (
+  id: keyof typeof VIDEO_IDS
+): string => {
+  const imageNumber = getImageNumber(id);
+
+  const imageId = String(
+    imageNumber
+  ).padStart(2, "0");
+
+  /*
+    Desktop images are expected to be JPG.
+
+    Example:
+
+    public/covers-desktop/balaji-01.jpg
+    public/covers-desktop/balaji-02.jpg
+    ...
+    public/covers-desktop/balaji-13.jpg
+  */
+
+  return `/covers-desktop/balaji-${imageId}.jpg`;
+};
+
+// ============================================================
+// TRACK CREATOR
 // ============================================================
 
 const makeTrack = (
   id: keyof typeof VIDEO_IDS,
   title: string
-): Track => ({
-  id,
-  title,
-  artist: "Balaji Devotional",
-  film: "",
-  year: 0,
-  duration: 0,
-  videoId: VIDEO_IDS[id],
-  cover: getCoverImage(id),
-});
+): Track => {
+  const mobileCover =
+    getMobileCover(id);
+
+  const desktopCover =
+    getDesktopCover(id);
+
+  return {
+    id,
+    title,
+    artist: "Balaji Devotional",
+    film: "",
+    year: 0,
+    duration: 0,
+    videoId: VIDEO_IDS[id],
+
+    mobileCover,
+    desktopCover,
+
+    // Mobile is the initial default.
+    cover: mobileCover,
+  };
+};
 
 // ============================================================
 // PLAYLISTS
-// TOTAL = 23 SONGS
 // ============================================================
 
 const PLAYLISTS = [
   {
     id: "tirumala",
     name: "Tirumala Classics",
-
     tracks: [
       makeTrack(
         "balaji-01",
@@ -284,7 +299,6 @@ const PLAYLISTS = [
   {
     id: "venkatesa",
     name: "Venkatesa Bhakti",
-
     tracks: [
       makeTrack(
         "balaji-10",
@@ -325,19 +339,18 @@ const PLAYLISTS = [
         "balaji-17",
         "Kamaneeyam"
       ),
+
+      makeTrack(
+        "balaji-18",
+        "Brahmanda Nayakuni Brahmotsavam"
+      ),
     ],
   },
 
   {
     id: "suprabhatam",
     name: "Morning & Suprabhatam",
-
     tracks: [
-      makeTrack(
-        "balaji-18",
-        "Brahmanda Nayakuni Brahmotsavam"
-      ),
-
       makeTrack(
         "balaji-19",
         "Adi Sesha Anantha Sayana Srinivasa"
@@ -370,7 +383,9 @@ const PLAYLISTS = [
 // FORMAT TIME
 // ============================================================
 
-function formatTime(value: number) {
+function formatTime(
+  value: number
+) {
   if (
     !Number.isFinite(value) ||
     value < 0
@@ -378,7 +393,8 @@ function formatTime(value: number) {
     return "0:00";
   }
 
-  const seconds = Math.floor(value);
+  const seconds =
+    Math.floor(value);
 
   return `${Math.floor(
     seconds / 60
@@ -453,7 +469,8 @@ function SeekBar({
           100,
           Math.max(
             0,
-            (progress / duration) *
+            (progress /
+              duration) *
               100
           )
         )
@@ -571,7 +588,7 @@ function TransportButton({
 }
 
 // ============================================================
-// VINYL EFFECT
+// VINYL
 // ============================================================
 
 function Vinyl({
@@ -589,6 +606,7 @@ function Vinyl({
             ? "h-16 w-16"
             : "h-20 w-20"
         }
+
         pointer-events-none
         absolute
         inset-0
@@ -604,6 +622,7 @@ function Vinyl({
           absolute
           inset-0
           rounded-full
+
           ${
             playing
               ? "[animation-play-state:running]"
@@ -618,6 +637,7 @@ function Vinyl({
             rounded-full
             border
             border-white/10
+
             bg-[radial-gradient(circle_at_center,transparent_0_10%,rgba(255,255,255,.09)_10.5%,transparent_11%,transparent_28%,rgba(255,255,255,.06)_28.5%,transparent_29%,transparent_47%,rgba(255,255,255,.05)_47.5%,transparent_48%)]
           "
         />
@@ -648,13 +668,50 @@ function Vinyl({
 
 function CoverImage({
   track,
+  isDesktop,
 }: {
   track: Track;
+  isDesktop: boolean;
 }) {
+  const [
+    imageSrc,
+    setImageSrc,
+  ] = useState(
+    track.cover
+  );
+
+  /*
+    If desktop image is missing,
+    automatically use mobile image.
+  */
+
+  useEffect(() => {
+    setImageSrc(
+      track.cover
+    );
+  }, [
+    track.cover,
+  ]);
+
+  const handleError = () => {
+    if (
+      isDesktop &&
+      imageSrc !==
+        track.mobileCover
+    ) {
+      setImageSrc(
+        track.mobileCover
+      );
+    }
+  };
+
   return (
     <img
-      src={track.cover}
+      src={imageSrc}
       alt={track.title}
+      onError={
+        handleError
+      }
       className="
         absolute
         inset-0
@@ -696,10 +753,18 @@ export default function MusicPlayer() {
     setDuration,
   ] = useState(0);
 
+  // ==========================================================
+  // DESKTOP / MOBILE
+  // ==========================================================
+
   const isDesktop =
     useMediaQuery(
       "(min-width: 640px)"
     );
+
+  // ==========================================================
+  // YOUTUBE
+  // ==========================================================
 
   const playerRef =
     useRef<YTPlayer | null>(
@@ -724,21 +789,7 @@ export default function MusicPlayer() {
       null
     );
 
-  // ==========================================================
-  // AUTOPLAY REF
-  // ==========================================================
-  //
-  // true = a new track should automatically start.
-  //
-  // This becomes true when:
-  //
-  // 1. User clicks Next
-  // 2. User clicks Previous
-  // 3. Current song finishes
-  //
-  // ==========================================================
-
-  const autoplayNextRef =
+  const autoPlayNextRef =
     useRef(false);
 
   const advanceRef =
@@ -749,7 +800,21 @@ export default function MusicPlayer() {
     >(() => {});
 
   // ==========================================================
-  // CURRENT PLAYLIST / TRACK
+  // BACKGROUND AUDIO
+  // ==========================================================
+
+  const ambienceRef =
+    useRef<HTMLAudioElement | null>(
+      null
+    );
+
+  const musicRef =
+    useRef<HTMLAudioElement | null>(
+      null
+    );
+
+  // ==========================================================
+  // CURRENT PLAYLIST
   // ==========================================================
 
   const playlist =
@@ -757,15 +822,194 @@ export default function MusicPlayer() {
       playlistIndex
     ];
 
-  const current =
+  const currentBase =
     playlist.tracks[
       trackIndex
     ];
+
+  // ==========================================================
+  // RESPONSIVE CURRENT TRACK
+  // ==========================================================
+
+  const current =
+    useMemo<Track>(() => {
+      return {
+        ...currentBase,
+
+        cover:
+          isDesktop
+            ? currentBase.desktopCover
+            : currentBase.mobileCover,
+      };
+    }, [
+      currentBase,
+      isDesktop,
+    ]);
+
+  // ==========================================================
+  // CURRENT YOUTUBE HOST
+  // ==========================================================
 
   const hostRef =
     isDesktop
       ? desktopHostRef
       : mobileHostRef;
+
+  // ==========================================================
+  // MAIN BACKGROUND IMAGE
+  // ==========================================================
+
+  useEffect(() => {
+    const hero =
+      document.querySelector(
+        ".hero-bg"
+      ) as HTMLElement | null;
+
+    if (!hero) {
+      return;
+    }
+
+    /*
+      First use the correct responsive
+      desktop/mobile image.
+    */
+
+    hero.style.backgroundImage =
+      `url("${current.cover}")`;
+
+    hero.style.backgroundSize =
+      "cover";
+
+    hero.style.backgroundPosition =
+      "center center";
+
+    hero.style.backgroundRepeat =
+      "no-repeat";
+
+    /*
+      Preload image.
+
+      If desktop image does not exist,
+      automatically fall back to mobile.
+    */
+
+    const testImage =
+      new Image();
+
+    testImage.onload =
+      () => {
+        hero.style.backgroundImage =
+          `url("${current.cover}")`;
+      };
+
+    testImage.onerror =
+      () => {
+        hero.style.backgroundImage =
+          `url("${current.mobileCover}")`;
+      };
+
+    testImage.src =
+      current.cover;
+  }, [
+    current.cover,
+    current.mobileCover,
+  ]);
+
+  // ==========================================================
+  // INITIALIZE BACKGROUND AUDIO
+  // ==========================================================
+
+  useEffect(() => {
+    const ambience =
+      new Audio(
+        AMBIENCE_AUDIO
+      );
+
+    const music =
+      new Audio(
+        MUSIC_AUDIO
+      );
+
+    ambience.loop = true;
+    music.loop = true;
+
+    ambience.volume = 0.16;
+    music.volume = 0.10;
+
+    ambience.preload = "auto";
+    music.preload = "auto";
+
+    ambienceRef.current =
+      ambience;
+
+    musicRef.current =
+      music;
+
+    return () => {
+      ambience.pause();
+      music.pause();
+
+      ambience.src = "";
+      music.src = "";
+
+      ambienceRef.current =
+        null;
+
+      musicRef.current =
+        null;
+    };
+  }, []);
+
+  // ==========================================================
+  // START BACKGROUND AUDIO
+  // ==========================================================
+
+  const startBackgroundAudio =
+    useCallback(
+      async () => {
+        const ambience =
+          ambienceRef.current;
+
+        const music =
+          musicRef.current;
+
+        if (
+          !ambience ||
+          !music
+        ) {
+          return;
+        }
+
+        try {
+          if (
+            ambience.paused
+          ) {
+            await ambience.play();
+          }
+        } catch {
+          // Browser autoplay policy.
+        }
+
+        try {
+          if (music.paused) {
+            await music.play();
+          }
+        } catch {
+          // Browser autoplay policy.
+        }
+      },
+      []
+    );
+
+  // ==========================================================
+  // PAUSE BACKGROUND AUDIO
+  // ==========================================================
+
+  const pauseBackgroundAudio =
+    useCallback(() => {
+      ambienceRef.current?.pause();
+      musicRef.current?.pause();
+    }, []);
 
   // ==========================================================
   // STOP PROGRESS
@@ -800,16 +1044,20 @@ export default function MusicPlayer() {
 
       const now =
         playerRef.current
-          .getCurrentTime() || 0;
+          .getCurrentTime() ||
+        0;
 
       const total =
         playerRef.current
-          .getDuration() || 0;
+          .getDuration() ||
+        0;
 
       setProgress(now);
 
       if (total > 0) {
-        setDuration(total);
+        setDuration(
+          total
+        );
       }
 
       animationRef.current =
@@ -844,13 +1092,18 @@ export default function MusicPlayer() {
       (
         direction: 1 | -1
       ) => {
-        // IMPORTANT:
-        //
-        // Tell the new YouTube player that it
-        // must automatically start.
-        //
-        autoplayNextRef.current =
+        void startBackgroundAudio();
+
+        /*
+          Tell the new YouTube player
+          to automatically start.
+        */
+
+        autoPlayNextRef.current =
           true;
+
+        setPlaying(false);
+        setProgress(0);
 
         setTrackIndex(
           (old) => {
@@ -858,16 +1111,21 @@ export default function MusicPlayer() {
               old +
               direction;
 
-            if (next < 0) {
+            if (
+              next < 0
+            ) {
               return (
-                playlist.tracks
-                  .length - 1
+                playlist
+                  .tracks
+                  .length -
+                1
               );
             }
 
             if (
               next >=
-              playlist.tracks
+              playlist
+                .tracks
                 .length
             ) {
               return 0;
@@ -877,7 +1135,10 @@ export default function MusicPlayer() {
           }
         );
       },
-      [playlist.tracks.length]
+      [
+        playlist.tracks.length,
+        startBackgroundAudio,
+      ]
     );
 
   advanceRef.current =
@@ -899,10 +1160,6 @@ export default function MusicPlayer() {
 
       playerRef.current?.destroy();
 
-      // Save whether this player needs autoplay.
-      const shouldAutoplay =
-        autoplayNextRef.current;
-
       playerRef.current =
         new window.YT.Player(
           hostRef.current,
@@ -911,13 +1168,7 @@ export default function MusicPlayer() {
               current.videoId,
 
             playerVars: {
-              // 1 when Next/Previous was clicked
-              // or when the previous song ended.
-              autoplay:
-                shouldAutoplay
-                  ? 1
-                  : 0,
-
+              autoplay: 0,
               controls: 0,
               rel: 0,
               modestbranding: 1,
@@ -926,132 +1177,149 @@ export default function MusicPlayer() {
             },
 
             events: {
-              // ==================================================
-              // PLAYER READY
-              // ==================================================
+              // =================================================
+              // READY
+              // =================================================
 
-              onReady: (
-                event
-              ) => {
-                const d =
-                  event.target
-                    .getDuration();
+              onReady:
+                (
+                  event
+                ) => {
+                  const d =
+                    event.target
+                      .getDuration();
 
-                if (d > 0) {
-                  setDuration(d);
-                }
+                  if (
+                    d > 0
+                  ) {
+                    setDuration(
+                      d
+                    );
+                  }
 
-                // ================================================
-                // IMPORTANT AUTOPLAY
-                // ================================================
-                //
-                // If this track was selected using Next,
-                // Previous, or automatic track advancement,
-                // immediately start it.
-                //
-                if (
-                  autoplayNextRef.current
-                ) {
-                  autoplayNextRef.current =
-                    false;
+                  /*
+                    Automatically play after
+                    Next / Previous.
+                  */
 
-                  event.target.playVideo();
-                }
-              },
+                  if (
+                    autoPlayNextRef.current
+                  ) {
+                    autoPlayNextRef.current =
+                      false;
 
-              // ==================================================
+                    void startBackgroundAudio();
+
+                    window.setTimeout(
+                      () => {
+                        try {
+                          event.target.playVideo();
+                        } catch {
+                          // Ignore startup errors.
+                        }
+                      },
+                      100
+                    );
+                  }
+                },
+
+              // =================================================
               // STATE CHANGE
-              // ==================================================
+              // =================================================
 
-              onStateChange: (
-                event
-              ) => {
-                const states =
-                  window.YT
-                    ?.PlayerState;
+              onStateChange:
+                (
+                  event
+                ) => {
+                  const states =
+                    window.YT
+                      ?.PlayerState;
 
-                if (!states) {
-                  return;
-                }
+                  if (
+                    !states
+                  ) {
+                    return;
+                  }
 
-                // -----------------------------------------------
-                // PLAYING
-                // -----------------------------------------------
+                  // PLAYING
+                  if (
+                    event.data ===
+                    states.PLAYING
+                  ) {
+                    setPlaying(
+                      true
+                    );
 
-                if (
-                  event.data ===
-                  states.PLAYING
-                ) {
-                  setPlaying(true);
+                    void startBackgroundAudio();
 
-                  startProgress();
-                }
+                    startProgress();
+                  }
 
-                // -----------------------------------------------
-                // PAUSED
-                // -----------------------------------------------
+                  // PAUSED
+                  else if (
+                    event.data ===
+                    states.PAUSED
+                  ) {
+                    setPlaying(
+                      false
+                    );
 
-                else if (
-                  event.data ===
-                  states.PAUSED
-                ) {
-                  setPlaying(false);
+                    stopProgress();
+
+                    pauseBackgroundAudio();
+                  }
+
+                  // ENDED
+                  else if (
+                    event.data ===
+                    states.ENDED
+                  ) {
+                    setPlaying(
+                      false
+                    );
+
+                    stopProgress();
+
+                    advanceRef.current(
+                      1
+                    );
+                  }
+                },
+
+              // =================================================
+              // ERROR
+              // =================================================
+
+              onError:
+                (
+                  event
+                ) => {
+                  analyticsTrack(
+                    "youtube_player_error",
+                    {
+                      code: String(
+                        event.data
+                      ),
+                      videoId:
+                        current.videoId,
+                    }
+                  );
+
+                  setPlaying(
+                    false
+                  );
 
                   stopProgress();
-                }
 
-                // -----------------------------------------------
-                // ENDED
-                // -----------------------------------------------
-
-                else if (
-                  event.data ===
-                  states.ENDED
-                ) {
-                  setPlaying(false);
-
-                  stopProgress();
-
-                  // The next track should automatically play.
-                  autoplayNextRef.current =
-                    true;
+                  /*
+                    Skip broken YouTube
+                    video automatically.
+                  */
 
                   advanceRef.current(
                     1
                   );
-                }
-              },
-
-              // ==================================================
-              // YOUTUBE ERROR
-              // ==================================================
-
-              onError: (
-                event
-              ) => {
-                analyticsTrack(
-                  "youtube_player_error",
-                  {
-                    code: String(
-                      event.data
-                    ),
-                    videoId:
-                      current.videoId,
-                  }
-                );
-
-                setPlaying(false);
-
-                stopProgress();
-
-                // Move to the next track automatically.
-                autoplayNextRef.current =
-                  true;
-
-                advanceRef.current(
-                  1
-                );
-              },
+                },
             },
           }
         );
@@ -1060,21 +1328,26 @@ export default function MusicPlayer() {
       hostRef,
       startProgress,
       stopProgress,
+      startBackgroundAudio,
+      pauseBackgroundAudio,
     ]);
 
   // ==========================================================
-  // LOAD YOUTUBE IFRAME API
+  // LOAD YOUTUBE API
   // ==========================================================
 
   useEffect(() => {
-    const ready = () => {
-      apiReadyRef.current =
-        true;
+    const ready =
+      () => {
+        apiReadyRef.current =
+          true;
 
-      createPlayer();
-    };
+        createPlayer();
+      };
 
-    if (window.YT?.Player) {
+    if (
+      window.YT?.Player
+    ) {
       ready();
       return;
     }
@@ -1087,7 +1360,9 @@ export default function MusicPlayer() {
         'script[src="https://www.youtube.com/iframe_api"]'
       );
 
-    if (!existingScript) {
+    if (
+      !existingScript
+    ) {
       const script =
         document.createElement(
           "script"
@@ -1112,10 +1387,16 @@ export default function MusicPlayer() {
           undefined;
       }
     };
-  }, [createPlayer]);
+  }, [
+    createPlayer,
+  ]);
 
   // ==========================================================
-  // RECREATE PLAYER WHEN SONG CHANGES
+  // RECREATE PLAYER WHEN:
+  //
+  // 1. SONG CHANGES
+  // 2. MOBILE -> DESKTOP
+  // 3. DESKTOP -> MOBILE
   // ==========================================================
 
   useEffect(() => {
@@ -1132,15 +1413,22 @@ export default function MusicPlayer() {
 
     stopProgress();
 
-    setPlaying(false);
-
-    setProgress(0);
-
-    setDuration(
-      current.duration || 0
+    setPlaying(
+      false
     );
 
-    if (current.videoId) {
+    setProgress(
+      0
+    );
+
+    setDuration(
+      current.duration ||
+        0
+    );
+
+    if (
+      current.videoId
+    ) {
       createPlayer();
     }
   }, [
@@ -1164,8 +1452,13 @@ export default function MusicPlayer() {
 
       playerRef.current =
         null;
+
+      pauseBackgroundAudio();
     };
-  }, [stopProgress]);
+  }, [
+    stopProgress,
+    pauseBackgroundAudio,
+  ]);
 
   // ==========================================================
   // SEEK
@@ -1173,7 +1466,9 @@ export default function MusicPlayer() {
 
   const seek =
     useCallback(
-      (ratio: number) => {
+      (
+        ratio: number
+      ) => {
         if (
           !playerRef.current ||
           duration <= 0
@@ -1182,16 +1477,21 @@ export default function MusicPlayer() {
         }
 
         const target =
-          duration * ratio;
+          duration *
+          ratio;
 
         playerRef.current.seekTo(
           target,
           true
         );
 
-        setProgress(target);
+        setProgress(
+          target
+        );
       },
-      [duration]
+      [
+        duration,
+      ]
     );
 
   // ==========================================================
@@ -1199,42 +1499,66 @@ export default function MusicPlayer() {
   // ==========================================================
 
   const togglePlay =
-    useCallback(() => {
-      if (
-        !playerRef.current
-      ) {
-        return;
-      }
+    useCallback(
+      () => {
+        if (
+          !playerRef.current
+        ) {
+          return;
+        }
 
-      if (playing) {
-        playerRef.current.pauseVideo();
-      } else {
-        playerRef.current.playVideo();
-      }
-    }, [playing]);
+        if (
+          playing
+        ) {
+          playerRef.current.pauseVideo();
+
+          pauseBackgroundAudio();
+        } else {
+          void startBackgroundAudio();
+
+          playerRef.current.playVideo();
+        }
+      },
+      [
+        playing,
+        startBackgroundAudio,
+        pauseBackgroundAudio,
+      ]
+    );
 
   // ==========================================================
   // CHANGE PLAYLIST
   // ==========================================================
 
-  const changePlaylist = (
-    index: number
-  ) => {
-    // Changing playlist manually should start
-    // the first song automatically.
-    autoplayNextRef.current =
-      true;
+  const changePlaylist =
+    (
+      index: number
+    ) => {
+      void startBackgroundAudio();
 
-    setPlaylistIndex(index);
+      autoPlayNextRef.current =
+        true;
 
-    setTrackIndex(0);
+      setPlaying(
+        false
+      );
 
-    setPlaying(false);
+      setProgress(
+        0
+      );
 
-    setProgress(0);
+      setDuration(
+        0
+      );
 
-    setDuration(0);
-  };
+      setPlaylistIndex(
+        index
+      );
+
+      setTrackIndex(
+        0
+      );
+    };
 
   // ==========================================================
   // SUBTITLE
@@ -1286,7 +1610,9 @@ export default function MusicPlayer() {
             index
           ) => (
             <button
-              key={item.id}
+              key={
+                item.id
+              }
               type="button"
               onClick={() =>
                 changePlaylist(
@@ -1308,7 +1634,9 @@ export default function MusicPlayer() {
                 }
               `}
             >
-              {item.name}
+              {
+                item.name
+              }
             </button>
           )
         )}
@@ -1330,7 +1658,7 @@ export default function MusicPlayer() {
           sm:flex
         "
       >
-        {/* COVER IMAGE */}
+        {/* DESKTOP COVER */}
 
         <div
           className="
@@ -1343,30 +1671,31 @@ export default function MusicPlayer() {
             bg-black
           "
         >
-          {/* REAL BALAJI COVER */}
-
           <CoverImage
             track={current}
+            isDesktop={
+              true
+            }
           />
 
-          {/* YOUTUBE PLAYER - HIDDEN VISUALLY */}
-
           <div
-            ref={desktopHostRef}
+            ref={
+              desktopHostRef
+            }
             className="
+              pointer-events-none
               absolute
               inset-0
               z-20
-              pointer-events-none
               opacity-0
             "
             aria-label="YouTube audio player"
           />
 
-          {/* VINYL EFFECT */}
-
           <Vinyl
-            playing={playing}
+            playing={
+              playing
+            }
           />
         </div>
 
@@ -1399,7 +1728,9 @@ export default function MusicPlayer() {
                   font-semibold
                 "
               >
-                {current.title}
+                {
+                  current.title
+                }
               </p>
 
               <p
@@ -1409,7 +1740,9 @@ export default function MusicPlayer() {
                   text-white/70
                 "
               >
-                {subtitle}
+                {
+                  subtitle
+                }
               </p>
             </div>
 
@@ -1421,20 +1754,30 @@ export default function MusicPlayer() {
                 text-white/55
               "
             >
-              {formatTime(
-                progress
-              )}{" "}
+              {
+                formatTime(
+                  progress
+                )
+              }{" "}
               /{" "}
-              {formatTime(
-                duration
-              )}
+              {
+                formatTime(
+                  duration
+                )
+              }
             </span>
           </div>
 
           <SeekBar
-            progress={progress}
-            duration={duration}
-            onSeek={seek}
+            progress={
+              progress
+            }
+            duration={
+              duration
+            }
+            onSeek={
+              seek
+            }
           />
         </div>
 
@@ -1452,7 +1795,9 @@ export default function MusicPlayer() {
           <TransportButton
             label="Previous track"
             onClick={() =>
-              advance(-1)
+              advance(
+                -1
+              )
             }
           >
             <span className="text-lg">
@@ -1483,9 +1828,11 @@ export default function MusicPlayer() {
               shadow-[0_8px_24px_rgba(242,184,75,.28)]
             "
           >
-            {playing
-              ? "Ⅱ"
-              : "▶"}
+            {
+              playing
+                ? "Ⅱ"
+                : "▶"
+            }
           </TransportButton>
 
           {/* NEXT */}
@@ -1493,7 +1840,9 @@ export default function MusicPlayer() {
           <TransportButton
             label="Next track"
             onClick={() =>
-              advance(1)
+              advance(
+                1
+              )
             }
           >
             <span className="text-lg">
@@ -1515,8 +1864,6 @@ export default function MusicPlayer() {
           sm:hidden
         "
       >
-        {/* COVER + SONG INFORMATION */}
-
         <div
           className="
             flex
@@ -1537,35 +1884,36 @@ export default function MusicPlayer() {
               bg-black
             "
           >
-            {/* REAL BALAJI COVER */}
-
             <CoverImage
               track={current}
+              isDesktop={
+                false
+              }
             />
 
-            {/* YOUTUBE PLAYER - HIDDEN VISUALLY */}
-
             <div
-              ref={mobileHostRef}
+              ref={
+                mobileHostRef
+              }
               className="
+                pointer-events-none
                 absolute
                 inset-0
                 z-20
-                pointer-events-none
                 opacity-0
               "
               aria-label="YouTube audio player"
             />
 
-            {/* VINYL EFFECT */}
-
             <Vinyl
               compact
-              playing={playing}
+              playing={
+                playing
+              }
             />
           </div>
 
-          {/* SONG NAME */}
+          {/* SONG INFORMATION */}
 
           <div
             className="
@@ -1579,7 +1927,9 @@ export default function MusicPlayer() {
                 font-semibold
               "
             >
-              {current.title}
+              {
+                current.title
+              }
             </p>
 
             <p
@@ -1589,22 +1939,30 @@ export default function MusicPlayer() {
                 text-white/70
               "
             >
-              {subtitle}
+              {
+                subtitle
+              }
             </p>
           </div>
         </div>
 
-        {/* SEEK BAR */}
+        {/* SEEK */}
 
         <div className="mt-3">
           <SeekBar
-            progress={progress}
-            duration={duration}
-            onSeek={seek}
+            progress={
+              progress
+            }
+            duration={
+              duration
+            }
+            onSeek={
+              seek
+            }
           />
         </div>
 
-        {/* TIME + CONTROLS */}
+        {/* MOBILE CONTROLS */}
 
         <div
           className="
@@ -1621,13 +1979,17 @@ export default function MusicPlayer() {
               text-white/55
             "
           >
-            {formatTime(
-              progress
-            )}{" "}
+            {
+              formatTime(
+                progress
+              )
+            }{" "}
             /{" "}
-            {formatTime(
-              duration
-            )}
+            {
+              formatTime(
+                duration
+              )
+            }
           </span>
 
           <div
@@ -1641,7 +2003,9 @@ export default function MusicPlayer() {
             <TransportButton
               label="Previous track"
               onClick={() =>
-                advance(-1)
+                advance(
+                  -1
+                )
               }
             >
               <span className="text-lg">
@@ -1672,9 +2036,11 @@ export default function MusicPlayer() {
                 shadow-[0_8px_24px_rgba(242,184,75,.32)]
               "
             >
-              {playing
-                ? "Ⅱ"
-                : "▶"}
+              {
+                playing
+                  ? "Ⅱ"
+                  : "▶"
+              }
             </TransportButton>
 
             {/* NEXT */}
@@ -1682,7 +2048,9 @@ export default function MusicPlayer() {
             <TransportButton
               label="Next track"
               onClick={() =>
-                advance(1)
+                advance(
+                  1
+                )
               }
             >
               <span className="text-lg">
